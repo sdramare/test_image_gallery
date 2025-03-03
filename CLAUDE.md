@@ -4,6 +4,7 @@
 - Build: `go build ./...`
 - Run: `go run ./cmd/server/main.go`
 - Test all: `go test ./...`
+- Test with coverage: `go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out`
 - Test single: `go test ./path/to/package -run TestName`
 - Lint: `golint ./...` (install: `go install golang.org/x/lint/golint@latest`)
 - Format: `go fmt ./...` or `gofmt -s -w .`
@@ -16,6 +17,8 @@
   - S3_BUCKET_NAME: AWS S3 bucket name
   - DYNAMODB_TABLE_NAME: AWS DynamoDB table name
   - PORT: Web server port number
+  - USE_LOCAL_STORAGE: Set to "true" to use local storage (no AWS required)
+  - LOCAL_STORAGE_PATH: Path for local storage (default: "./data/images")
   - AWS_REGION: (optional) AWS region
   - AWS_ACCESS_KEY_ID: (optional) AWS access key
   - AWS_SECRET_ACCESS_KEY: (optional) AWS secret key
