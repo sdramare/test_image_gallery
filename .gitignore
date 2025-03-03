@@ -1,55 +1,47 @@
-# Binary files and build output
-/bin/
-/build/
+# Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+bin/
 
 # Test binary, built with `go test -c`
 *.test
 
 # Output of the go coverage tool
 *.out
+coverage.out
 
-# Go workspace file
-go.work
+# Dependency directories (remove these if you're including dependencies in your repo)
+vendor/
 
-# Local data storage (for local development)
-/data/
-
-# Environment variables file (contains secrets)
+# Local development files
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
-# Dependency directories
-/vendor/
+# Generated files
+_templ_cache/
 
-# IDE files
+# Data directories
+data/images/
+data/db/
+
+# IDE specific files
 .idea/
 .vscode/
 *.swp
 *.swo
+
+# OS specific files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Temporary files
-/tmp/
-/temp/
-
-# Log files
-*.log
-
-# AWS credentials
-.aws/
-
-# Terraform files
-.terraform/
-*.tfstate
-*.tfstate.backup
-
-# Generated files by OpenAPI generator
-/api/openapi/gen/
+# Do NOT ignore templ generated files - keep them in version control
+# *_templ.go

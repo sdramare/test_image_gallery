@@ -14,12 +14,14 @@ A web application built with Go that allows users to add, update, delete, and li
 - Integration with AWS DynamoDB for metadata storage
 - Bootstrap 5 UI with modern design and icons
 - Responsive layout for mobile and desktop
+- Type-safe HTML templates with github.com/a-h/templ
 
 ## Prerequisites
 
 - Go 1.24 or higher
 - AWS account with S3 and DynamoDB access
 - AWS credentials configured locally
+- templ command-line tool (for template generation)
 
 ## Environment Configuration
 
@@ -114,6 +116,7 @@ The application will be available at `http://localhost:8080`.
 
 ## Development
 
+- `make templ`: Generate templ components
 - `make dev`: Build and run the application
 - `make test`: Run tests
 - `make clean`: Clean built files

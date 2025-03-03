@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -16,50 +15,21 @@ import (
 
 	"image_gallery/internal/models"
 	"image_gallery/internal/services"
+	"image_gallery/internal/templates/components"
 )
-
-// TemplateData contains data to be passed to templates
-type TemplateData struct {
-	PageName string      // Name of the template to render
-	Data     interface{} // Data to pass to the template
-}
 
 // ImageHandler handles HTTP requests for images
 type ImageHandler struct {
 	storageService  services.StorageService
 	databaseService services.DatabaseService
-	templates       *template.Template
 }
 
 // NewImageHandler creates a new image handler
 func NewImageHandler(storageService services.StorageService, databaseService services.DatabaseService) *ImageHandler {
-	// Load templates with proper error handling
-	templ, err := loadTemplates()
-	if err != nil {
-		log.Fatalf("Failed to load templates: %v", err)
-	}
-	
 	return &ImageHandler{
 		storageService:  storageService,
 		databaseService: databaseService,
-		templates:       templ,
 	}
-}
-
-// loadTemplates loads all HTML templates
-func loadTemplates() (*template.Template, error) {
-	// Create a template with layout.html as the base template
-	templates := template.New("templates")
-	
-	// Add a function to format times
-	templates = templates.Funcs(template.FuncMap{
-		"formatTime": func(t time.Time) string {
-			return t.Format("Jan 2, 2006 at 15:04")
-		},
-	})
-	
-	// Parse all templates
-	return templates.ParseGlob("internal/templates/*.html")
 }
 
 // generateID creates a random ID for images
@@ -96,12 +66,7 @@ func (h *ImageHandler) ListImages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// For web page requests
-	templateData := TemplateData{
-		PageName: "list",
-		Data:     images,
-	}
-	
-	if err := h.templates.ExecuteTemplate(w, "layout", templateData); err != nil {
+	if err := components.RenderListPage(w, images); err != nil {
 		log.Printf("Error rendering template: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
@@ -132,12 +97,7 @@ func (h *ImageHandler) GetImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// For web page requests
-	templateData := TemplateData{
-		PageName: "view",
-		Data:     image,
-	}
-	
-	if err := h.templates.ExecuteTemplate(w, "layout", templateData); err != nil {
+	if err := components.RenderViewPage(w, image); err != nil {
 		log.Printf("Error rendering template: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
@@ -145,12 +105,7 @@ func (h *ImageHandler) GetImage(w http.ResponseWriter, r *http.Request) {
 
 // UploadImageForm displays the form to upload an image
 func (h *ImageHandler) UploadImageForm(w http.ResponseWriter, r *http.Request) {
-	templateData := TemplateData{
-		PageName: "upload",
-		Data:     nil,
-	}
-	
-	if err := h.templates.ExecuteTemplate(w, "layout", templateData); err != nil {
+	if err := components.RenderUploadPage(w); err != nil {
 		log.Printf("Error rendering template: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
@@ -167,13 +122,13 @@ func (h *ImageHandler) EditImageForm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Image not found", http.StatusNotFound)
 		return
 	}
-
-	templateData := TemplateData{
-		PageName: "edit",
-		Data:     image,
-	}
 	
-	if err := h.templates.ExecuteTemplate(w, "layout", templateData); err != nil {
+	url, err := h.storageService.GetImageURL(ctx, image.S3Key)
+	if err == nil {
+		image.S3Key = url
+	}
+
+	if err := components.RenderEditPage(w, image); err != nil {
 		log.Printf("Error rendering template: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}

@@ -1,7 +1,11 @@
-.PHONY: build run clean test
+.PHONY: build run clean test templ
+
+# Generate templ templates
+templ:
+	templ generate ./internal/templates/components
 
 # Build the application
-build:
+build: templ
 	go build -o bin/server ./cmd/server
 
 # Run the application

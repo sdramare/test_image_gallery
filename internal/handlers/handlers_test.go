@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"html/template"
 	"io"
 	"image_gallery/internal/models"
 	"mime/multipart"
@@ -97,39 +96,6 @@ func (m *MockDatabaseService) DeleteImage(_ context.Context, id string) error {
 	return nil
 }
 
-// createMockTemplates creates mock templates for testing
-func createMockTemplates() *template.Template {
-	// Create a simple template with the required templates
-	tmpl := template.New("templates")
-	
-	// Add a content template
-	template.Must(tmpl.New("content").Parse(`
-		{{range .}}
-		<div>{{.Title}}</div>
-		<div>{{.Description}}</div>
-		{{end}}
-	`))
-	
-	// Add a layout template
-	template.Must(tmpl.New("layout").Parse(`
-		<html>
-		<body>
-		{{if eq .PageName "list"}}
-			{{template "content" .Data}}
-		{{else}}
-			Unknown page
-		{{end}}
-		</body>
-		</html>
-	`))
-	
-	// Add view, upload, and edit templates
-	template.Must(tmpl.New("view-content").Parse(`View: {{.Title}}`))
-	template.Must(tmpl.New("upload-content").Parse(`Upload form`))
-	template.Must(tmpl.New("edit-content").Parse(`Edit: {{.Title}}`))
-	
-	return tmpl
-}
 
 func TestListImages(t *testing.T) {
 	// Set up mock services
@@ -165,11 +131,10 @@ func TestListImages(t *testing.T) {
 		mockDB.SaveImage(context.Background(), img)
 	}
 
-	// Create a handler with a mock template
+	// Create a handler
 	handler := &ImageHandler{
 		storageService:  mockStorage,
 		databaseService: mockDB,
-		templates:       createMockTemplates(),
 	}
 
 	// Test HTML output
@@ -252,11 +217,10 @@ func TestServeImage(t *testing.T) {
 	imageContent := []byte("test image content")
 	mockStorage.images["test.jpg"] = imageContent
 
-	// Create a handler with a mock template
+	// Create a handler
 	handler := &ImageHandler{
 		storageService:  mockStorage,
 		databaseService: mockDB,
-		templates:       createMockTemplates(),
 	}
 
 	t.Run("ServeImage_Success", func(t *testing.T) {
